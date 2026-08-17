@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Register Equipment &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">Register Equipment</h1>
+<div class="card border-0 shadow-sm" style="max-width: 560px;">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Asset tag</label>
+        <input type="text" name="asset_tag" class="form-control" placeholder="e.g. EXC-0142" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Equipment class</label>
+        <input type="text" name="equipment_class" class="form-control" placeholder="Excavator, Dump Truck, Grader…" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Home store</label>
+        <select name="home_store" class="form-select">
+          {% for store in stores %}
+            <option value="{{ store.pk }}">{{ store.code }} — {{ store.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Meter type</label>
+        <select name="meter_type" class="form-select">
+          {% for value, label in meter_types %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Fuel type</label>
+        <select name="fuel_type" class="form-select">
+          {% for value, label in fuel_types %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4">Register</button>
+        <a href="{% url 'fleet:equipment_list' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

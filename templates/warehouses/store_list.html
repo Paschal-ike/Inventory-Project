@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Stores &amp; Quarries &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h4 mb-0">Stores &amp; Quarries</h1>
+  <a href="{% url 'warehouses:store_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>New Store
+  </a>
+</div>
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr><th>Code</th><th>Name</th><th>Type</th><th>Country</th><th>State / Region</th><th>Project</th></tr>
+      </thead>
+      <tbody>
+        {% for store in stores %}
+          <tr onclick="window.location='{% url 'warehouses:store_detail' pk=store.pk %}'" style="cursor:pointer;">
+            <td class="fw-semibold">{{ store.code }}</td>
+            <td>{{ store.name }}</td>
+            <td><span class="badge text-bg-light status-badge">{{ store.get_store_type_display }}</span></td>
+            <td>{{ store.get_country_display }}</td>
+            <td>{{ store.state_or_region }}</td>
+            <td>{{ store.project.code|default:"—" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No stores yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

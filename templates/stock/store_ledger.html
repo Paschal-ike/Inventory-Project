@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ store.code }} Ledger &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-1">
+    <li class="breadcrumb-item"><a href="{% url 'warehouses:store_detail' pk=store.pk %}">{{ store.code }}</a></li>
+    <li class="breadcrumb-item active">Ledger</li>
+  </ol>
+</nav>
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <h1 class="h4 mb-0">{{ store.name }} — Stock Ledger</h1>
+  <div class="d-flex gap-2">
+    {% if quarry %}
+      <a href="{% url 'stock:quarry_receipt_form' quarry_pk=quarry.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-hammer me-1"></i>Log Production</a>
+    {% endif %}
+    <a href="{% url 'stock:receive_form' store_pk=store.pk %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-box-arrow-in-down me-1"></i>Receive</a>
+    <a href="{% url 'stock:transfer_form' store_pk=store.pk %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left-right me-1"></i>Transfer</a>
+    <a href="{% url 'stock:issue_form' store_pk=store.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-box-arrow-up me-1"></i>Issue</a>
+    <a href="{% url 'stock:adjust_form' store_pk=store.pk %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-clipboard-check me-1"></i>Count</a>
+  </div>
+</div>
+
+<h2 class="h6 text-muted mb-2">On hand</h2>
+<div class="card border-0 shadow-sm mb-4">
+  <div class="table-responsive">
+    <table class="table table-tabular-nums mb-0 align-middle">
+      <thead class="table-light"><tr><th>Item</th><th class="text-end">Qty on hand</th></tr></thead>
+      <tbody>
+        {% for row in balances %}
+          <tr><td>{{ row.item__sku }} — {{ row.item__name }}</td><td class="text-end">{{ row.quantity_on_hand }} {{ row.item__unit_of_measure }}</td></tr>
+        {% empty %}
+          <tr><td colspan="2" class="text-center text-muted py-4">No stock recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<h2 class="h6 text-muted mb-2">Recent transactions</h2>
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-tabular-nums mb-0 align-middle">
+      <thead class="table-light">
+        <tr><th>Date</th><th>Type</th><th>Item</th><th class="text-end">Qty</th><th>Cost Code</th><th>Equipment</th><th>By</th></tr>
+      </thead>
+      <tbody>
+        {% for txn in transactions %}
+          <tr>
+            <td>{{ txn.created_at|date:"M j, Y H:i" }}</td>
+            <td><span class="badge {% if txn.is_inbound %}text-bg-success{% else %}text-bg-danger{% endif %} status-badge">{{ txn.get_transaction_type_display }}</span></td>
+            <td>{{ txn.item.sku }}</td>
+            <td class="text-end">{{ txn.quantity }}</td>
+            <td>{{ txn.cost_code.code|default:"—" }}</td>
+            <td>{{ txn.equipment.asset_tag|default:"—" }}</td>
+            <td>{{ txn.created_by.username }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No transactions yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Stock Count &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-1">
+    <li class="breadcrumb-item"><a href="{% url 'stock:store_ledger' store_pk=store.pk %}">{{ store.code }}</a></li>
+    <li class="breadcrumb-item active">Stock Count</li>
+  </ol>
+</nav>
+<h1 class="h4 mb-4">Stock Count — {{ store.name }}</h1>
+<div class="alert alert-light border small">
+  A shortfall against the system quantity needs a cost code to charge the loss to — e.g. a stock-loss overhead code.
+  An overage doesn't need one.
+</div>
+<div class="card border-0 shadow-sm" style="max-width: 560px;">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Item</label>
+        <select name="item" class="form-select" required>
+          {% for item in items %}
+            <option value="{{ item.pk }}">{{ item.sku }} — {{ item.name }} ({{ item.unit_of_measure }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Counted quantity</label>
+        <input type="number" step="0.001" name="counted_quantity" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Cost code (required if the count is short)</label>
+        <select name="cost_code" class="form-select">
+          <option value="">— None —</option>
+          {% for cc in cost_codes %}
+            <option value="{{ cc.pk }}">{{ cc.code }}{% if cc.project %} ({{ cc.project.code }}){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Reference</label>
+        <input type="text" name="reference" class="form-control" placeholder="Stock-take reference">
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4">Record Count</button>
+        <a href="{% url 'stock:store_ledger' store_pk=store.pk %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

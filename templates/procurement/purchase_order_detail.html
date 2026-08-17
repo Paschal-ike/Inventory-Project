@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ po.reference }} &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-1">
+    <li class="breadcrumb-item"><a href="{% url 'procurement:purchase_order_list' %}">Purchase Orders</a></li>
+    <li class="breadcrumb-item active">{{ po.reference }}</li>
+  </ol>
+</nav>
+<div class="mb-4">
+  <h1 class="h4 mb-1">{{ po.reference }}</h1>
+  <span class="badge text-bg-light me-1">{{ po.supplier.name }}</span>
+  <span class="badge text-bg-light me-1">{{ po.store.code }}</span>
+  <span class="badge text-bg-light status-badge">{{ po.get_status_display }}</span>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-tabular-nums mb-0 align-middle">
+      <thead class="table-light">
+        <tr><th>Item</th><th class="text-end">Ordered</th><th class="text-end">Received</th><th class="text-end">Unit Price</th><th>Cost Code</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for line in lines %}
+          <tr>
+            <td>{{ line.item.sku }} — {{ line.item.name }}</td>
+            <td class="text-end">{{ line.quantity_ordered }}</td>
+            <td class="text-end">{{ line.quantity_received }}</td>
+            <td class="text-end">{{ line.unit_price }}</td>
+            <td>{{ line.cost_code.code|default:"—" }}</td>
+            <td>
+              {% if line.quantity_outstanding > 0 %}
+              <form method="post" action="{% url 'procurement:receive_line' pk=line.pk %}" class="d-flex gap-1">
+                {% csrf_token %}
+                <input type="number" step="0.001" name="quantity" class="form-control form-control-sm" style="width:100px;" placeholder="Qty" required>
+                <button type="submit" class="btn btn-sm btn-outline-primary">Receive</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No lines on this order.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

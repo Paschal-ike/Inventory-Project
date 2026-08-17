@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Issue Stock &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-1">
+    <li class="breadcrumb-item"><a href="{% url 'stock:store_ledger' store_pk=store.pk %}">{{ store.code }}</a></li>
+    <li class="breadcrumb-item active">Issue</li>
+  </ol>
+</nav>
+<h1 class="h4 mb-4">Issue Stock — {{ store.name }}</h1>
+<div class="alert alert-light border small">
+  Every issue must carry a cost code — pick one directly, or attach it via a work order that already has one.
+  If you're dispensing fuel against an equipment unit, a meter reading is required.
+</div>
+<div class="card border-0 shadow-sm" style="max-width: 640px;">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Item</label>
+        <select name="item" class="form-select" required>
+          {% for item in items %}
+            <option value="{{ item.pk }}">{{ item.sku }} — {{ item.name }} ({{ item.unit_of_measure }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Quantity</label>
+        <input type="number" step="0.001" name="quantity" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Cost code</label>
+        <select name="cost_code" class="form-select">
+          <option value="">— Use work order's cost code —</option>
+          {% for cc in cost_codes %}
+            <option value="{{ cc.pk }}">{{ cc.code }}{% if cc.project %} ({{ cc.project.code }}){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Equipment (for fuel / spares)</label>
+        <select name="equipment" class="form-select">
+          <option value="">— None —</option>
+          {% for eq in equipment %}
+            <option value="{{ eq.pk }}">{{ eq.asset_tag }} — {{ eq.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Work order (optional)</label>
+        <input type="number" name="work_order" class="form-control" placeholder="Work order ID">
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Meter reading (required for fuel against equipment)</label>
+        <input type="number" step="0.1" name="meter_reading" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Reference</label>
+        <input type="text" name="reference" class="form-control">
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4">Issue</button>
+        <a href="{% url 'stock:store_ledger' store_pk=store.pk %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

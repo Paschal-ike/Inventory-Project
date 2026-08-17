@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}New Store &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">New Store</h1>
+<div class="card border-0 shadow-sm" style="max-width: 560px;">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Code</label>
+        <input type="text" name="code" class="form-control" placeholder="e.g. LAG-EPE-01" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Store type</label>
+        <select name="store_type" class="form-select">
+          {% for value, label in store_types %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Country</label>
+        <select name="country" class="form-select">
+          <option value="NG">Nigeria</option>
+          <option value="TG">Togo</option>
+          <option value="BJ">Benin</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">State / Region</label>
+        <input type="text" name="state_or_region" class="form-control" required>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4">Create Store</button>
+        <a href="{% url 'warehouses:store_list' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

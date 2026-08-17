@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Dashboard &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">Dashboard</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h6 text-muted mb-0">Your projects</h2>
+  <a href="{% url 'projects:project_list' %}" class="small">View all &rarr;</a>
+</div>
+
+{% if projects %}
+<div class="row g-3">
+  {% for project in projects %}
+  <div class="col-md-4">
+    <a href="{% url 'projects:project_detail' pk=project.pk %}" class="text-decoration-none">
+      <div class="card stat-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="badge text-bg-light">{{ project.code }}</span>
+            <span class="badge {% if project.status == 'active' %}text-bg-success{% else %}text-bg-secondary{% endif %} status-badge">{{ project.get_status_display }}</span>
+          </div>
+          <div class="fw-semibold text-body">{{ project.name }}</div>
+          <div class="small text-muted mt-1">{{ project.currency }}</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="bi bi-kanban empty-state-icon"></i>
+  <p>You're not on any projects yet.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ store.code }} &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-1">
+    <li class="breadcrumb-item"><a href="{% url 'warehouses:store_list' %}">Stores &amp; Quarries</a></li>
+    <li class="breadcrumb-item active">{{ store.code }}</li>
+  </ol>
+</nav>
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <h1 class="h4 mb-1">{{ store.name }}</h1>
+    <span class="badge text-bg-light me-1">{{ store.code }}</span>
+    <span class="badge text-bg-light status-badge">{{ store.get_store_type_display }}</span>
+    <span class="badge text-bg-light">{{ store.get_country_display }} — {{ store.state_or_region }}</span>
+  </div>
+  <a href="{% url 'stock:store_ledger' store_pk=store.pk %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-journal-text me-1"></i>View Ledger
+  </a>
+</div>
+
+<h2 class="h6 text-muted mb-2">Stock on hand</h2>
+<div class="card border-0 shadow-sm mb-4">
+  <div class="table-responsive">
+    <table class="table table-tabular-nums mb-0 align-middle">
+      <thead class="table-light"><tr><th>Item</th><th class="text-end">Qty on hand</th></tr></thead>
+      <tbody>
+        {% for row in balances %}
+          <tr><td>{{ row.item__sku }} — {{ row.item__name }}</td><td class="text-end">{{ row.quantity_on_hand }} {{ row.item__unit_of_measure }}</td></tr>
+        {% empty %}
+          <tr><td colspan="2" class="text-center text-muted py-4">No stock recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<h2 class="h6 text-muted mb-2">Assigned users</h2>
+<div class="card border-0 shadow-sm">
+  <ul class="list-group list-group-flush">
+    {% for a in assignments %}
+      <li class="list-group-item">{{ a.user.get_full_name|default:a.user.username }} <span class="text-muted small">({{ a.user.get_role_display }})</span></li>
+    {% empty %}
+      <li class="list-group-item text-muted">No one assigned yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

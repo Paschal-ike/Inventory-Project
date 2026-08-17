@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}New Project &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">New Project</h1>
+<div class="card border-0 shadow-sm" style="max-width: 560px;">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Project code</label>
+        <input type="text" name="code" class="form-control" placeholder="e.g. EPE-EXP" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Description</label>
+        <textarea name="description" class="form-control" rows="3"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Currency</label>
+        <select name="currency" class="form-select">
+          {% for value, label in currencies %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4">Create Project</button>
+        <a href="{% url 'projects:project_list' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

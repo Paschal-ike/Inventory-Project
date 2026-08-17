@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Log Production &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-1">
+    <li class="breadcrumb-item"><a href="{% url 'stock:store_ledger' store_pk=quarry.stockyard_id %}">{{ quarry.stockyard.code }}</a></li>
+    <li class="breadcrumb-item active">Log Production</li>
+  </ol>
+</nav>
+<h1 class="h4 mb-4">Log Production — {{ quarry.name }}</h1>
+<div class="alert alert-light border small">
+  This is an internal transfer source, not a purchase — no PO involved. Unit cost here is the quarry's production
+  cost (extraction + plant time), which carries forward when this material is later transferred to a project site.
+</div>
+<div class="card border-0 shadow-sm" style="max-width: 560px;">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Item</label>
+        <select name="item" class="form-select" required>
+          {% for item in items %}
+            <option value="{{ item.pk }}">{{ item.sku }} — {{ item.name }} ({{ item.unit_of_measure }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Quantity produced</label>
+        <input type="number" step="0.001" name="quantity" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Production unit cost</label>
+        <input type="number" step="0.01" name="unit_cost" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Reference</label>
+        <input type="text" name="reference" class="form-control" placeholder="Production log number">
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4">Log Production</button>
+        <a href="{% url 'stock:store_ledger' store_pk=quarry.stockyard_id %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

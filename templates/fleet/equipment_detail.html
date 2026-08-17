@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}{{ equipment.asset_tag }} &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-1">
+    <li class="breadcrumb-item"><a href="{% url 'fleet:equipment_list' %}">Fleet &amp; Equipment</a></li>
+    <li class="breadcrumb-item active">{{ equipment.asset_tag }}</li>
+  </ol>
+</nav>
+<div class="mb-4">
+  <h1 class="h4 mb-1">{{ equipment.name }}</h1>
+  <span class="badge text-bg-light me-1">{{ equipment.asset_tag }}</span>
+  <span class="badge text-bg-light me-1">{{ equipment.equipment_class }}</span>
+  <span class="badge text-bg-light me-1">{{ equipment.home_store.code }}</span>
+  <span class="badge text-bg-light">{{ equipment.current_meter_reading }} {{ equipment.get_meter_type_display }}</span>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <h2 class="h6 text-muted mb-2">Fuel &amp; spares history</h2>
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="table-responsive">
+        <table class="table table-tabular-nums mb-0 align-middle">
+          <thead class="table-light"><tr><th>Date</th><th>Type</th><th>Item</th><th class="text-end">Qty</th><th>Cost Code</th></tr></thead>
+          <tbody>
+            {% for txn in transactions %}
+              <tr>
+                <td>{{ txn.created_at|date:"M j, Y H:i" }}</td>
+                <td><span class="badge text-bg-light status-badge">{{ txn.get_transaction_type_display }}</span></td>
+                <td>{{ txn.item.sku }}</td>
+                <td class="text-end">{{ txn.quantity }}</td>
+                <td>{{ txn.cost_code.code|default:"—" }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="text-center text-muted py-4">No fuel or spares issued yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h2 class="h6 text-muted mb-0">Work orders</h2>
+    </div>
+    <div class="card border-0 shadow-sm mb-3">
+      <ul class="list-group list-group-flush">
+        {% for wo in work_orders %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>WO-{{ wo.pk }} — {{ wo.get_work_type_display }}</span>
+              <span class="badge {% if wo.status == 'closed' %}text-bg-secondary{% else %}text-bg-warning{% endif %} status-badge">{{ wo.get_status_display }}</span>
+            </div>
+            <div class="small text-muted">{{ wo.cost_code.code|default:"Plant overhead" }}</div>
+            {% if wo.status != 'closed' %}
+              <form method="post" action="{% url 'fleet:work_order_close' pk=wo.pk %}" class="mt-1">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Close</button>
+              </form>
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No work orders yet.</li>
+        {% endfor %}
+      </ul>
+      <div class="card-body border-top">
+        <form method="post" action="{% url 'fleet:work_order_create' pk=equipment.pk %}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label class="form-label small fw-semibold text-secondary">Type</label>
+            <select name="work_type" class="form-select form-select-sm">
+              <option value="breakdown">Breakdown</option>
+              <option value="preventive_maintenance">Preventive Maintenance</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold text-secondary">Cost code (blank = plant overhead)</label>
+            <select name="cost_code" class="form-select form-select-sm">
+              <option value="">— Plant overhead —</option>
+              {% for cc in cost_codes %}
+                <option value="{{ cc.pk }}">{{ cc.code }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold text-secondary">Description</label>
+            <textarea name="description" class="form-control form-control-sm" rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-100">Open Work Order</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Purchase Orders &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h4 mb-0">Purchase Orders</h1>
+  <a href="{% url 'admin:procurement_purchaseorder_add' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>New PO (Admin)
+  </a>
+</div>
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr><th>Reference</th><th>Supplier</th><th>Store</th><th>Status</th><th>Currency</th></tr>
+      </thead>
+      <tbody>
+        {% for po in purchase_orders %}
+          <tr onclick="window.location='{% url 'procurement:purchase_order_detail' pk=po.pk %}'" style="cursor:pointer;">
+            <td class="fw-semibold">{{ po.reference }}</td>
+            <td>{{ po.supplier.name }}</td>
+            <td>{{ po.store.code }}</td>
+            <td><span class="badge text-bg-light status-badge">{{ po.get_status_display }}</span></td>
+            <td>{{ po.currency }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No open purchase orders.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}My Profile &middot; {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">My Profile</h1>
+<div class="card border-0 shadow-sm" style="max-width: 480px;">
+  <div class="card-body">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <span class="user-avatar" style="width: 52px; height: 52px; font-size: 1.4rem;">
+        {{ user.get_full_name|default:user.username|slice:":1"|upper }}
+      </span>
+      <div>
+        <div class="fw-semibold fs-5">{{ user.get_full_name|default:user.username }}</div>
+        <span class="badge text-bg-secondary status-badge">{{ user.get_role_display }}</span>
+      </div>
+    </div>
+    <dl class="row mb-4">
+      <dt class="col-4 text-muted">Username</dt>
+      <dd class="col-8">{{ user.username }}</dd>
+      <dt class="col-4 text-muted">Full name</dt>
+      <dd class="col-8">{{ user.get_full_name|default:"—" }}</dd>
+      <dt class="col-4 text-muted">Email</dt>
+      <dd class="col-8">{{ user.email|default:"—" }}</dd>
+    </dl>
+    <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-key me-1"></i>Change Password
+    </a>
+  </div>
+</div>
+{% endblock %}
