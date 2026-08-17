@@ -14,6 +14,8 @@ A Django system for tracking warehouse/quarry stock, plant & equipment fuel and 
 - **Audit** (`audit`) — an audit trail of the actions that matter (user/project/cost-code/store/item/equipment creation, work orders, quarry production).
 - **API** — a DRF API with browsable schema/docs at `/api/schema/`, `/api/docs/` (Swagger), and `/api/redoc/`.
 
+See [USER_STORIES.md](USER_STORIES.md) for who uses the system, by role, and the end-to-end flows (quarry → site, procurement → stock, fleet fuel/spares, cost tracking).
+
 ## Tech stack
 
 - Django 5.1, PostgreSQL (via `psycopg`)
